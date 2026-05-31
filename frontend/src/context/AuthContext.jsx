@@ -5,7 +5,7 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const stored = sessionStorage.getItem('user')
-    return stored ? JSON.parse(stored) : { name: 'Biki', email: 'biki@test.com' }
+    return stored ? JSON.parse(stored) : null
   })
 
   const login = (userData, token) => {

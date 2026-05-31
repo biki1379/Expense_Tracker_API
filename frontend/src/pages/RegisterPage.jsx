@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import api from '../api/axiosInstance'
 
 export default function RegisterPage() {
+  const { login } = useAuth()
   const navigate = useNavigate()
 
   const [form, setForm] = useState({
@@ -23,8 +25,10 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await api.post('/auth/register', form)
-      navigate('/login')
+      const response = await api.post('/auth/register', form)
+      const { token, user } = response.data
+      login(user, token)
+      navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Try again.')
     } finally {

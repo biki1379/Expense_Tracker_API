@@ -3,12 +3,13 @@ package com.example.expensetracker.controller;
 import com.example.expensetracker.dto.ExpenseCreateRequest;
 import com.example.expensetracker.dto.ExpenseResponse;
 import com.example.expensetracker.service.ExpenseService;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/expenses")
+@RequestMapping("/api/v1/expenses")
 public class ExpenseController {
 
     private final ExpenseService expenseService;
@@ -17,33 +18,31 @@ public class ExpenseController {
         this.expenseService = expenseService;
     }
 
-    // CREATE expense
     @PostMapping
-    public ExpenseResponse addExpense(@RequestBody ExpenseCreateRequest request) {
+    public ExpenseResponse addExpense(@RequestBody ExpenseCreateRequest request,
+                                      Authentication auth) {
+        request.setUserId((Long) auth.getPrincipal());
         return expenseService.addExpense(request);
     }
 
-    // GET all expenses by user
-    @GetMapping("/user/{userId}")
-    public List<ExpenseResponse> getExpensesByUser(@PathVariable Long userId) {
-        return expenseService.getExpensesByUser(userId);
+    @GetMapping
+    public List<ExpenseResponse> getMyExpenses(Authentication auth) {
+        return expenseService.getExpensesByUser((Long) auth.getPrincipal());
     }
 
-    // GET single expense by id
     @GetMapping("/{expenseId}")
     public ExpenseResponse getExpenseById(@PathVariable Long expenseId) {
         return expenseService.getExpenseById(expenseId);
     }
 
-    // UPDATE expense
     @PutMapping("/{expenseId}")
-    public ExpenseResponse updateExpense(
-            @PathVariable Long expenseId,
-            @RequestBody ExpenseCreateRequest request) {
+    public ExpenseResponse updateExpense(@PathVariable Long expenseId,
+                                         @RequestBody ExpenseCreateRequest request,
+                                         Authentication auth) {
+        request.setUserId((Long) auth.getPrincipal());
         return expenseService.updateExpense(expenseId, request);
     }
 
-    // DELETE expense
     @DeleteMapping("/{expenseId}")
     public void deleteExpense(@PathVariable Long expenseId) {
         expenseService.deleteExpense(expenseId);
